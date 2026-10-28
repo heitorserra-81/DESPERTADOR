@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Alvorada – Despertador com missões</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#181c45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#181c45;--bg2:#10133a;--card:#232865;--card2:#2d3380;--tx:#f4f2ff;--mut:#a9aedb;--sun:#ffc24a;--sun2:#ff8f5a;--ok:#7be0b0;--bad:#ff7b8f;--r:22px;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg2)}
+body{font-family:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI",system-ui,sans-serif;color:var(--tx);display:flex;justify-content:center}
+#app{width:100%;max-width:480px;height:100%;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);position:relative;display:flex;flex-direction:column;overflow:hidden}
+main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 24px}
+h1{font-size:28px;margin:0 0 4px;letter-spacing:-.5px}h2{font-size:18px;margin:22px 0 10px}
+.mut{color:var(--mut);font-size:14px;margin:0}
+.card{background:var(--card);border-radius:var(--r);padding:18px;margin-bottom:14px}
+input,select{width:100%;background:var(--bg2);border:2px solid transparent;color:var(--tx);border-radius:14px;padding:14px 16px;font:inherit;font-size:16px;margin-bottom:10px;outline:0}
+input:focus{border-color:var(--sun)}
+.btn{width:100%;border:0;border-radius:16px;padding:15px;font:inherit;font-weight:700;font-size:16px;color:#2a1a00;background:linear-gradient(90deg,var(--sun),var(--sun2));cursor:pointer}
+.btn.sec{background:var(--card2);color:var(--tx)}.btn.bad{background:transparent;color:var(--bad);border:2px solid var(--bad)}
+.btn:active{transform:scale(.98)}.btn:focus-visible,.chip:focus-visible,.tab:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.lnk{background:none;border:0;color:var(--mut);font:inherit;width:100%;padding:12px;cursor:pointer}
+.err{color:var(--bad);min-height:20px;margin:0 0 8px;font-size:14px}
+.auth{padding-top:8vh;text-align:center}.logo{font-size:64px}
+.auth .card{text-align:left;margin-top:22px}
+nav{display:flex;background:var(--bg2);padding:8px 8px calc(env(safe-area-inset-bottom,0px) + 8px);border-top:1px solid #ffffff14}
+.tab{flex:1;background:none;border:0;color:var(--mut);font:inherit;font-size:12px;padding:8px 0;border-radius:14px;cursor:pointer}
+.tab b{display:block;font-size:22px;font-weight:400}.tab.on{color:var(--sun)}
+.hero{text-align:center;padding:10px 0 4px}.hero svg{width:210px;height:210px}
+.hero .n{font-size:54px;font-weight:800;margin-top:-132px;line-height:1}.hero .l{color:var(--mut);margin-bottom:84px}
+.row{display:flex;align-items:center;gap:12px}.grow{flex:1}
+.big{font-size:34px;font-weight:800;letter-spacing:-1px}
+.al{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;cursor:pointer}
+.al.off{opacity:.55}.al .t{font-size:32px;font-weight:800;letter-spacing:-1px}
+.sw{width:52px;height:30px;border-radius:30px;background:var(--bg2);position:relative;border:0;flex:none;cursor:pointer}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--mut);transition:.2s}
+.sw.on{background:var(--sun)}.sw.on::after{left:25px;background:#fff}
+.fab{position:absolute;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);width:58px;height:58px;border-radius:50%;border:0;font-size:30px;font-weight:700;color:#2a1a00;background:linear-gradient(135deg,var(--sun),var(--sun2));box-shadow:0 8px 24px #0006;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{border:2px solid var(--card2);background:none;color:var(--tx);border-radius:30px;padding:9px 14px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--sun);border-color:var(--sun);color:#2a1a00;font-weight:700}
+.sheet,.ring{position:absolute;inset:0;display:none;z-index:5}.sheet.on,.ring.on{display:flex}
+.sheet{background:#0009;align-items:flex-end}.sheet>div{background:var(--bg);width:100%;border-radius:28px 28px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom,0px) + 22px);max-height:92%;overflow:auto}
+.ring{background:linear-gradient(180deg,#ff8f5a,#ffc24a);color:#2a1a00;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:9}
+.ring .sun{font-size:72px;animation:p 1s infinite alternate}@keyframes p{to{transform:scale(1.15)}}
+.ring h1{font-size:64px;margin:0}.ring .box{background:#fffc;border-radius:var(--r);padding:20px;width:100%;margin-top:20px}
+.ring input{background:#fff;color:#2a1a00;text-align:center;font-size:22px}.ring .btn{background:#2a1a00;color:#ffe9b8}
+.bar{height:14px;border-radius:14px;background:#2a1a0022;overflow:hidden;margin:12px 0}.bar i{display:block;height:100%;width:0;background:#2a1a00}
+.bars{display:flex;gap:8px;align-items:flex-end;height:120px;margin-top:10px}
+.bars div{flex:1;text-align:center;font-size:12px;color:var(--mut)}.bars i{display:block;border-radius:8px;background:var(--card2);height:6px;margin-bottom:6px}.bars i.d{background:linear-gradient(var(--sun),var(--sun2));height:80px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.stats .card{text-align:center;padding:14px 6px;margin:0}
+.toast{position:absolute;left:20px;right:20px;top:calc(env(safe-area-inset-top,0px) + 14px);background:var(--ok);color:#06301d;font-weight:700;padding:14px;border-radius:16px;z-index:20;transform:translateY(-140%);transition:.3s;text-align:center}
+.toast.on{transform:none}
+@media (prefers-reduced-motion:reduce){.ring .sun{animation:none}*{transition:none!important}}
+</style></head><body><div id="app"><div class="toast" id="toast"></div><div id="view" style="display:contents"></div><div class="sheet" id="sheet"></div><div class="ring" id="ring"></div></div>
+<script>
+const $=s=>document.querySelector(s),K='alvorada_v1',DIAS=['D','S','T','Q','Q','S','S'],MIS={math:['🧮','Contas rápidas','Resolva 3 contas'],frase:['⌨️','Digite a frase','Escreva a frase motivadora'],seg:['🧘','Respire fundo','Segure o botão por 10 s']};
+let DB=JSON.parse(localStorage.getItem(K)||'{"users":{},"s":null}'),mode='login',tab='home',ed=null,ringing=null,ac;
+const save=()=>localStorage.setItem(K,JSON.stringify(DB)),U=()=>DB.users[DB.s],p2=n=>String(n).padStart(2,'0');
+const dkey=d=>(d=d||new Date(),d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function sha(t){if(!(window.crypto&&crypto.subtle))return btoa(unescape(encodeURIComponent(t)));const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>p2(x.toString(16))).join('')}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600)}
+function streak(){const h=U().history;let d=new Date(),n=0;if(!h[dkey(d)])d.setDate(d.getDate()-1);while(h[dkey(d)]){n++;d.setDate(d.getDate()-1)}return n}
+function best(){let b=0,c=0,p=null;Object.keys(U().history).sort().forEach(k=>{const t=new Date(k+'T00:00:00');c=p&&Math.round((t-p)/864e5)===1?c+1:1;b=Math.max(b,c);p=t});return b}
+function nextAl(){const n=new Date();let r=null;U().alarms.filter(a=>a.on&&a.days.length).forEach(a=>{for(let i=0;i<8;i++){const d=new Date(n);d.setDate(n.getDate()+i);const[h,m]=a.t.split(':');d.setHours(+h,+m,0,0);if(d>n&&a.days.includes(d.getDay())){if(!r||d<r.d)r={a,d};break}}});return r}
+function until(d){const m=Math.round((d-new Date())/6e4),h=Math.floor(m/60);return h>=24?Math.floor(h/24)+' d '+h%24+' h':h?h+' h '+m%60+' min':m+' min'}
+/* ---------- telas ---------- */
+function render(){const v=$('#view');if(!U()){v.innerHTML=`<main><div class="auth"><div class="logo">🌅</div><h1>Alvorada</h1><p class="mut">Acorde, vença a missão e mantenha a sequência.</p><div class="card">${mode=='signup'?'<input id="nm" placeholder="Seu nome" autocomplete="name">':''}<input id="em" type="email" placeholder="E-mail" autocomplete="email"><input id="pw" type="password" placeholder="Senha (mínimo 6 caracteres)" autocomplete="current-password"><p class="err" id="er"></p><button class="btn" onclick="auth()">${mode=='signup'?'Criar conta':'Entrar'}</button><button class="lnk" onclick="mode=mode=='signup'?'login':'signup';render()">${mode=='signup'?'Já tenho conta. Entrar':'Não tenho conta. Criar agora'}</button></div></div></main>`;return}
+const T={home:homeV,alarms:alV,hist:histV,me:meV};
+v.innerHTML=`<main>${T[tab]()}</main>${tab=='alarms'?'<button class="fab" aria-label="Novo alarme" onclick="openEd()">+</button>':''}<nav>${[['home','☀️','Hoje'],['alarms','⏰','Alarmes'],['hist','📈','Progresso'],['me','👤','Perfil']].map(t=>`<button class="tab ${tab==t[0]?'on':''}" onclick="tab='${t[0]}';render()"><b>${t[1]}</b>${t[2]}</button>`).join('')}</nav>`}
+function homeV(){const u=U(),s=streak(),h=new Date().getHours(),g=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite',done=!!u.history[dkey()],ms=[3,7,14,30,60,100,365],goal=ms.find(x=>x>s)||s+1,pct=Math.min(1,s/goal),C=2*Math.PI*84,nx=nextAl();
+return `<h1>${g}, ${esc(u.name)}</h1><p class="mut">${done?'Missão de hoje concluída. Bom trabalho!':'Complete a missão da manhã para manter a sequência.'}</p>
+<div class="hero"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="84" fill="none" stroke="#2d3380" stroke-width="14"/><circle cx="100" cy="100" r="84" fill="none" stroke="url(#g)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 100 100)"/><defs><linearGradient id="g"><stop offset="0" stop-color="#ffc24a"/><stop offset="1" stop-color="#ff8f5a"/></linearGradient></defs></svg><div class="n">${s}</div><div class="l">${s==1?'dia seguido':'dias seguidos'} · meta ${goal}</div></div>
+<div class="card"><div class="row"><div class="grow"><p class="mut">Próximo alarme</p><div class="big">${nx?nx.a.t:'--:--'}</div><p class="mut">${nx?esc(nx.a.n)+' · em '+until(nx.d):'Nenhum alarme ativo'}</p></div><button class="btn sec" style="width:auto;padding:12px 16px" onclick="tab='alarms';render()">Editar</button></div></div>
+<button class="btn" onclick="ring(u0(),1)">Testar missão agora</button><p class="mut" style="margin-top:12px">Mantenha o app aberto para o alarme tocar. No celular, instale pelo navegador (Adicionar à tela inicial).</p>`}
+const u0=()=>U().alarms[0]||{id:0,n:'Teste',m:'math'};
+function alV(){const a=U().alarms;return `<h1>Alarmes</h1><p class="mut" style="margin-bottom:16px">Toque em um alarme para editar.</p>${a.length?a.map(x=>`<div class="al ${x.on?'':'off'}" onclick="openEd(${x.id})"><div class="grow"><div class="t">${x.t}</div><p class="mut">${esc(x.n)} · ${MIS[x.m][0]} ${MIS[x.m][1]}</p><p class="mut">${x.days.length==7?'Todos os dias':x.days.length?x.days.map(d=>DIAS[d]).join(' '):'Sem repetição'}</p></div><button class="sw ${x.on?'on':''}" aria-label="Ativar alarme" onclick="event.stopPropagation();tg(${x.id})"></button></div>`).join(''):'<div class="card"><p class="mut">Nenhum alarme ainda. Toque em + para criar o primeiro.</p></div>'}`}
+function histV(){const h=U().history,ks=Object.keys(h),days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d}),n7=days.filter(d=>h[dkey(d)]).length;
+return `<h1>Progresso</h1><p class="mut">Seus últimos 7 dias</p><div class="card"><div class="bars">${days.map(d=>`<div><i class="${h[dkey(d)]?'d':''}"></i>${'DSTQQSS'[d.getDay()]}</div>`).join('')}</div></div>
+<div class="stats"><div class="card"><div class="big">${streak()}</div><p class="mut">sequência</p></div><div class="card"><div class="big">${best()}</div><p class="mut">recorde</p></div><div class="card"><div class="big">${ks.length}</div><p class="mut">missões</p></div></div>
+<h2>Esta semana: ${n7} de 7 dias</h2>${ks.length?ks.sort().reverse().slice(0,10).map(k=>`<div class="card row"><div style="font-size:26px">${MIS[h[k].m][0]}</div><div class="grow"><b>${k.split('-').reverse().join('/')}</b><p class="mut">${MIS[h[k].m][1]}</p></div><span style="color:var(--ok)">✔</span></div>`).join(''):'<div class="card"><p class="mut">Sem registros. Conclua uma missão para começar.</p></div>'}`}
+function meV(){const u=U(),np='Notification'in window?Notification.permission:'unsupported';
+return `<h1>Perfil</h1><p class="mut" style="margin-bottom:16px">${esc(DB.s)}</p><div class="card"><p class="mut">Nome</p><input id="pn" value="${esc(u.name)}" onchange="U().name=this.value.trim()||'Madrugador';save();toast('Nome salvo')"></div>
+<div class="card"><b>Notificações</b><p class="mut" style="margin:6px 0 12px">${np=='granted'?'Ativadas neste aparelho.':np=='denied'?'Bloqueadas. Libere nas configurações do navegador.':np=='unsupported'?'Este navegador não suporta notificações.':'Ative para receber o aviso na hora do alarme.'}</p>${np=='default'?'<button class="btn sec" onclick="askN()">Ativar notificações</button>':''}</div>
+<button class="btn sec" style="margin-bottom:10px" onclick="demo()">Carregar dados de exemplo</button><button class="btn sec" style="margin-bottom:10px" onclick="DB.s=null;save();render()">Sair da conta</button><button class="btn bad" onclick="if(confirm('Apagar sua conta e todos os dados deste aparelho?')){delete DB.users[DB.s];DB.s=null;save();render()}">Excluir conta</button>`}
+/* ---------- ações ---------- */
+async function auth(){const em=$('#em').value.trim().toLowerCase(),pw=$('#pw').value,er=$('#er');if(!/^\S+@\S+\.\S+$/.test(em))return er.textContent='Digite um e-mail válido.';if(pw.length<6)return er.textContent='A senha precisa ter 6 ou mais caracteres.';const h=await sha(em+pw);
+if(mode=='signup'){if(DB.users[em])return er.textContent='Este e-mail já tem conta. Toque em Entrar.';DB.users[em]={name:$('#nm').value.trim()||'Madrugador',h,alarms:[{id:1,t:'07:00',n:'Acordar',days:[1,2,3,4,5],m:'math',on:true}],history:{}}}else if(!DB.users[em]||DB.users[em].h!==h)return er.textContent='E-mail ou senha incorretos.';
+DB.s=em;tab='home';save();render()}
+function tg(id){const a=U().alarms.find(x=>x.id==id);a.on=!a.on;save();render()}
+function askN(){Notification.requestPermission().then(render)}
+function demo(){const h=U().history;for(let i=1;i<=5;i++){const d=new Date();d.setDate(d.getDate()-i);h[dkey(d)]={m:['math','frase','seg'][i%3]}}save();toast('Dados de exemplo carregados');render()}
+function openEd(id){ed=id?JSON.parse(JSON.stringify(U().alarms.find(x=>x.id==id))):{id:0,t:'07:00',n:'Acordar',days:[1,2,3,4,5],m:'math',on:true};drawEd()}
+function drawEd(){const s=$('#sheet');s.classList.add('on');s.innerHTML=`<div><h1>${ed.id?'Editar alarme':'Novo alarme'}</h1><input type="time" value="${ed.t}" oninput="ed.t=this.value" style="font-size:36px;text-align:center;font-weight:800"><input value="${esc(ed.n)}" placeholder="Nome do alarme" oninput="ed.n=this.value"><p class="mut" style="margin-bottom:8px">Repetir</p><div class="chips">${DIAS.map((d,i)=>`<button class="chip ${ed.days.includes(i)?'on':''}" onclick="ed.days=ed.days.includes(${i})?ed.days.filter(x=>x!=${i}):[...ed.days,${i}];drawEd()">${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][i]}</button>`).join('')}</div><p class="mut" style="margin-bottom:8px">Missão para desligar</p><div class="chips">${Object.keys(MIS).map(k=>`<button class="chip ${ed.m==k?'on':''}" onclick="ed.m='${k}';drawEd()">${MIS[k][0]} ${MIS[k][1]}</button>`).join('')}</div><button class="btn" onclick="saveEd()">Salvar alarme</button><button class="btn sec" style="margin-top:10px" onclick="closeEd()">Cancelar</button>${ed.id?'<button class="lnk" style="color:var(--bad)" onclick="delEd()">Excluir alarme</button>':''}</div>`}
+const closeEd=()=>$('#sheet').classList.remove('on');
+function saveEd(){if(!ed.t)return toast('Escolha um horário');const l=U().alarms;ed.n=ed.n.trim()||'Alarme';if(ed.id){l[l.findIndex(x=>x.id==ed.id)]=ed}else{ed.id=Date.now();l.push(ed)}l.sort((a,b)=>a.t.localeCompare(b.t));save();closeEd();render();toast('Alarme salvo')}
+function delEd(){U().alarms=U().alarms.filter(x=>x.id!=ed.id);save();closeEd();render()}
+/* ---------- alarme e missões ---------- */
+document.addEventListener('click',()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){}});
+let bt;function beep(on){clearInterval(bt);if(!on||!ac)return;const go=()=>{const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=880;g.gain.value=.12;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.25)};go();bt=setInterval(go,600);navigator.vibrate&&navigator.vibrate([300,150,300])}
+setInterval(()=>{if(!U()||ringing)return;const n=new Date(),hm=p2(n.getHours())+':'+p2(n.getMinutes());U().alarms.forEach(a=>{const k=dkey()+hm;if(a.on&&a.t===hm&&a.days.includes(n.getDay())&&a.last!==k){a.last=k;save();ring(a)}})},1000);
+const FR=['Eu acordei e vou vencer o dia','Cada manhã é um novo começo','Levanto agora e agradeço depois'];let M;
+function ring(a,test){ringing=a;M={test,n:0,q:null,fr:FR[Math.floor(Math.random()*3)]};beep(1);if(!test&&'Notification'in window&&Notification.permission==='granted')try{new Notification('⏰ '+a.n,{body:'Hora de acordar! Complete a missão.'})}catch(e){}
+const n=new Date(),r=$('#ring');r.classList.add('on');r.innerHTML=`<div class="sun">🌅</div><h1>${p2(n.getHours())}:${p2(n.getMinutes())}</h1><p style="font-size:20px;font-weight:700">${esc(a.n)}</p><div class="box" id="mb"></div><button class="lnk" style="color:#2a1a00" onclick="snooze()">Soneca 5 min</button>`;mis()}
+function mis(){const a=ringing,b=$('#mb');if(a.m=='math'){const x=2+Math.floor(Math.random()*8),y=3+Math.floor(Math.random()*8),z=Math.floor(Math.random()*20);M.q=x*y+z;b.innerHTML=`<p><b>Conta ${M.n+1} de 3</b></p><p style="font-size:34px;font-weight:800;margin:10px 0">${x} × ${y} + ${z}</p><input id="ans" inputmode="numeric" placeholder="Resposta" autofocus><button class="btn" onclick="chk()">Confirmar</button>`}
+else if(a.m=='frase'){b.innerHTML=`<p>Digite exatamente:</p><p style="font-size:22px;font-weight:800;margin:10px 0">“${M.fr}”</p><input id="ans" autocomplete="off" autocapitalize="off" placeholder="Digite aqui"><button class="btn" onclick="chk()">Confirmar</button>`}
+else{b.innerHTML=`<p><b>Respire fundo.</b> Mantenha o botão pressionado por 10 segundos.</p><div class="bar"><i id="pg"></i></div><button class="btn" id="hold" style="touch-action:none">Segure aqui</button>`;const h=$('#hold');let t0,iv;const st=e=>{e.preventDefault();t0=Date.now();iv=setInterval(()=>{const p=Math.min(1,(Date.now()-t0)/1e4);$('#pg').style.width=p*100+'%';if(p>=1){clearInterval(iv);fin()}},50)},en=()=>{clearInterval(iv);if($('#pg'))$('#pg').style.width='0'};h.onpointerdown=st;h.onpointerup=h.onpointerleave=h.onpointercancel=en}}
+function chk(){const v=$('#ans').value.trim(),a=ringing;if(a.m=='math'){if(+v!==M.q){$('#ans').value='';$('#ans').placeholder='Errado, tente de novo';return}M.n++;if(M.n>=3)return fin();mis()}else{if(v.toLowerCase()!==M.fr.toLowerCase()){$('#ans').placeholder='Não confere, tente de novo';return}fin()}}
+function fin(){beep(0);const a=ringing;ringing=null;$('#ring').classList.remove('on');if(!M.test){U().history[dkey()]={m:a.m};save();toast('Missão concluída! Sequência: '+streak()+' 🔥')}else toast('Teste concluído');tab='home';render()}
+function snooze(){const a=ringing;beep(0);ringing=null;$('#ring').classList.remove('on');toast('Soneca de 5 minutos');setTimeout(()=>{if(!ringing&&U())ring(a)},3e5)}
+render();if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
